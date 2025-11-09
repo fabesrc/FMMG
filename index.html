@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Mi Amor - Día de las Flores Moradas</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f5f0ff, #e6d7ff, #d9c7fa);
+            min-height: 100vh; overflow-x: hidden;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            color: #4a2c6d; text-align: center;
+        }
+        .container { max-width: 800px; padding: 2rem; z-index: 10; position: relative; }
+        h1 { font-size: 3.5rem; margin-bottom: 1.5rem; color: #6b3fa0; animation: pulse 3s infinite; }
+        h2 { font-size: 2rem; margin-bottom: 1rem; color: #8a5cb6; }
+        .message {
+            font-size: 1.3rem; line-height: 1.6; margin: 2rem 0;
+            background-color: rgba(255,255,255,0.7); padding: 1.5rem;
+            border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            backdrop-filter: blur(5px);
+        }
+        .heart { color: #d63384; font-size: 2rem; animation: heartbeat 1.5s infinite; }
+        .flower-field {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1;
+        }
+        .flower {
+            position: absolute; width: 40px; height: 60px;
+            animation: float 20s linear infinite;
+            filter: drop-shadow(0 0 5px rgba(139,69,180,0.3));
+        }
+        .flower-bud {
+            position: absolute; width: 40px; height: 40px;
+            background: linear-gradient(135deg, #8a2be2, #9370db);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            z-index: 2; box-shadow: inset 0 0 10px rgba(255,255,255,0.5);
+        }
+        .flower-petals { position: absolute; width: 40px; height: 40px; z-index: 1; }
+        .petal {
+            position: absolute; width: 25px; height: 35px;
+            background: linear-gradient(to bottom, #ba55d3, #8a2be2);
+            border-radius: 50%; transform-origin: bottom center;
+            box-shadow: inset 0 0 8px rgba(255,255,255,0.4);
+        }
+        .petal:nth-child(1) { transform: rotate(0deg) translateY(-15px); }
+        .petal:nth-child(2) { transform: rotate(72deg) translateY(-15px); }
+        .petal:nth-child(3) { transform: rotate(144deg) translateY(-15px); }
+        .petal:nth-child(4) { transform: rotate(216deg) translateY(-15px); }
+        .petal:nth-child(5) { transform: rotate(288deg) translateY(-15px); }
+        .flower-stem {
+            position: absolute; width: 4px; height: 60px;
+            background: linear-gradient(to bottom, #2e8b57, #3cb371);
+            top: 20px; left: 18px; z-index: 0; border-radius: 2px;
+        }
+        .flower-leaf {
+            position: absolute; width: 15px; height: 10px;
+            background: linear-gradient(to right, #3cb371, #2e8b57);
+            border-radius: 50% 0 50% 0; z-index: 0;
+        }
+        .flower-leaf.left { top: 35px; left: 5px; transform: rotate(-20deg); }
+        .flower-leaf.right { top: 45px; left: 23px; transform: rotate(20deg); }
+        .music-controls {
+            background-color: rgba(255,255,255,0.9); padding: 1.5rem;
+            border-radius: 20px; margin-top: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; align-items: center; gap: 15px;
+            backdrop-filter: blur(5px); border: 2px solid #8a5cb6;
+            max-width: 500px; margin: 0 auto;
+        }
+        .music-buttons { display: flex; gap: 15px; align-items: center; }
+        .music-btn {
+            background: #8a5cb6; color: white; border: none; border-radius: 50%;
+            width: 50px; height: 50px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+        .music-btn:hover { background: #6b3fa0; transform: scale(1.1); }
+        .song-info { font-size: 1.2rem; color: #6b3fa0; font-weight: bold; }
+        .volume-control { display: flex; align-items: center; gap: 12px; width: 100%; max-width: 250px; }
+        .volume-slider { flex: 1; height: 6px; border-radius: 3px; background: #e6d7ff; outline: none; }
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+            background: #8a5cb6; cursor: pointer; border: 2px solid white;
+        }
+        .music-note { font-size: 2rem; animation: float-note 3s ease-in-out infinite; }
+        .loading-message { color: #8a5cb6; font-size: 1rem; margin-top: 10px; font-style: italic; }
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; } 90% { opacity: 0.8; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+        @keyframes float-note {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-5px) rotate(5deg); }
+            75% { transform: translateY(-3px) rotate(-3deg); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); }
+        }
+        @keyframes heartbeat {
+            0% { transform: scale(1); } 25% { transform: scale(1.1); }
+            50% { transform: scale(1); } 75% { transform: scale(1.1); } 100% { transform: scale(1); }
+        }
+        .signature { margin-top: 2rem; font-style: italic; font-size: 1.2rem; color: #6b3fa0; }
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; } h2 { font-size: 1.5rem; } .message { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="flower-field" id="flowerField"></div>
+    <div class="container">
+        <h1>¡Feliz Día de las Flores Moradas!</h1>
+        <h2>Para la mujer más especial de mi vida</h2>
+        <div class="message">
+            <p>En este día tan especial, quiero recordarte lo mucho que significas para mí.</p>
+            <p>Cada flor morada representa un momento hermoso que hemos compartido juntos,</p>
+            <p>un recuerdo que atesoro en mi corazón, y la promesa de muchos más por venir.</p>
+            <p>Eres la luz que ilumina mis días y la razón de mi sonrisa constante.</p>
+            <p>Te amo más de lo que las palabras pueden expresar <span class="heart">♥</span></p>
+        </div>
+        <div class="music-controls">
+            <div class="song-info"><span class="music-note">🎵</span> Nuestra Canción Especial</div>
+            <div class="music-buttons">
+                <button class="music-btn" id="playBtn">▶</button>
+                <button class="music-btn" id="pauseBtn">⏸</button>
+                <button class="music-btn" id="stopBtn">⏹</button>
+            </div>
+            <div class="volume-control">
+                <span>🔊</span><input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.1" value="0.7"><span>🔊</span>
+            </div>
+            <div class="loading-message" id="loadingMessage">Haz clic en reproducir</div>
+        </div>
+        <p class="signature">Con todo mi amor, para siempre.</p>
+    </div>
+    <script>
+        const flowerField = document.getElementById('flowerField');
+        for (let i = 0; i < 25; i++) createFlower();
+        function createFlower() {
+            const flower = document.createElement('div');
+            flower.classList.add('flower');
+            flower.style.left = `${Math.random() * 100}vw`;
+            flower.style.transform = `scale(${0.7 + Math.random() * 0.6})`;
+            flower.style.animationDelay = `${Math.random() * 20}s`;
+            flower.style.animationDuration = `${20 + Math.random() * 15}s`;
+            const hue = 270 + Math.random() * 40;
+            const color1 = `hsl(${hue}, 70%, 60%)`;
+            const color2 = `hsl(${hue + 20}, 70%, 50%)`;
+            const flowerBud = document.createElement('div');
+            flowerBud.classList.add('flower-bud');
+            flowerBud.style.background = `linear-gradient(135deg, ${color1}, ${color2})`;
+            const flowerPetals = document.createElement('div');
+            flowerPetals.classList.add('flower-petals');
+            for (let j = 0; j < 5; j++) {
+                const petal = document.createElement('div');
+                petal.classList.add('petal');
+                petal.style.background = `linear-gradient(to bottom, ${color2}, ${color1})`;
+                flowerPetals.appendChild(petal);
+            }
+            const flowerStem = document.createElement('div');
+            flowerStem.classList.add('flower-stem');
+            const leafLeft = document.createElement('div');
+            leafLeft.classList.add('flower-leaf', 'left');
+            const leafRight = document.createElement('div');
+            leafRight.classList.add('flower-leaf', 'right');
+            flower.appendChild(flowerPetals);
+            flower.appendChild(flowerBud);
+            flower.appendChild(flowerStem);
+            flower.appendChild(leafLeft);
+            flower.appendChild(leafRight);
+            flowerField.appendChild(flower);
+            setTimeout(() => {
+                flower.remove();
+                createFlower();
+            }, (20 + Math.random() * 15 + Math.random() * 20) * 1000);
+        }
+        document.addEventListener('click', function(e) {
+            createClickFlower(e.clientX, e.clientY);
+        });
+        function createClickFlower(x, y) {
+            const clickFlower = document.createElement('div');
+            clickFlower.classList.add('flower');
+            clickFlower.style.left = `${x}px`;
+            clickFlower.style.top = `${y}px`;
+            clickFlower.style.position = 'fixed';
+            clickFlower.style.animation = 'none';
+            clickFlower.style.transform = 'scale(0) rotate(0deg)';
+            clickFlower.style.transition = 'all 0.8s ease-out';
+            const hue = 270 + Math.random() * 40;
+            const color1 = `hsl(${hue}, 70%, 60%)`;
+            const color2 = `hsl(${hue + 20}, 70%, 50%)`;
+            const flowerBud = document.createElement('div');
+            flowerBud.classList.add('flower-bud');
+            flowerBud.style.background = `linear-gradient(135deg, ${color1}, ${color2})`;
+            const flowerPetals = document.createElement('div');
+            flowerPetals.classList.add('flower-petals');
+            for (let j = 0; j < 5; j++) {
+                const petal = document.createElement('div');
+                petal.classList.add('petal');
+                petal.style.background = `linear-gradient(to bottom, ${color2}, ${color1})`;
+                flowerPetals.appendChild(petal);
+            }
+            const flowerStem = document.createElement('div');
+            flowerStem.classList.add('flower-stem');
+            const leafLeft = document.createElement('div');
+            leafLeft.classList.add('flower-leaf', 'left');
+            const leafRight = document.createElement('div');
+            leafRight.classList.add('flower-leaf', 'right');
+            clickFlower.appendChild(flowerPetals);
+            clickFlower.appendChild(flowerBud);
+            clickFlower.appendChild(flowerStem);
+            clickFlower.appendChild(leafLeft);
+            clickFlower.appendChild(leafRight);
+            document.body.appendChild(clickFlower);
+            setTimeout(() => {
+                clickFlower.style.transform = 'scale(1.2) rotate(180deg)';
+                clickFlower.style.opacity = '0.9';
+            }, 10);
+            setTimeout(() => {
+                clickFlower.style.transform = 'scale(1.5) rotate(360deg)';
+                clickFlower.style.opacity = '0';
+            }, 800);
+            setTimeout(() => {
+                clickFlower.remove();
+            }, 1500);
+        }
+        const audio = new Audio();
+        const loadingMessage = document.getElementById('loadingMessage');
+        audio.src = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+        audio.loop = true;
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        playBtn.addEventListener('click', () => {
+            audio.play();
+            loadingMessage.textContent = 'Reproduciendo nuestra canción especial ♫';
+        });
+        pauseBtn.addEventListener('click', () => {
+            audio.pause();
+            loadingMessage.textContent = 'Canción en pausa';
+        });
+        stopBtn.addEventListener('click', () => {
+            audio.pause();
+            audio.currentTime = 0;
+            loadingMessage.textContent = 'Canción detenida';
+        });
+        volumeSlider.addEventListener('input', () => {
+            audio.volume = volumeSlider.value;
+        });
+        audio.volume = volumeSlider.value;
+        document.addEventListener('click', function firstClick() {
+            audio.play().then(() => {
+                loadingMessage.textContent = 'Reproduciendo nuestra canción especial ♫';
+            });
+            document.removeEventListener('click', firstClick);
+        }, { once: true });
+    </script>
+</body>
+</html>
